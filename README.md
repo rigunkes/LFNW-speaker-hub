@@ -20,169 +20,59 @@ Uploading a map using [GitHub Pages](https://docs.github.com/pages) will host yo
 
 Uploading a map using the [WA map storage](https://docs.workadventu.re/map-building/tiled-editor/publish/wa-hosted) will host your project on WA servers. It's a bit more difficult to set up, but it comes with great advantages, like being able to have private repositories.
 
-## 🗂️ Project Structure
+## 🗂️ Structure
 
-```
-map-starter-kit/
-├── 📁 app/                    # Server entry point (loads @workadventure/map-starter-kit-core)
-│   └── app.ts                 # Re-exports the Express app from the core package
-│
-├── 📁 src/                    # Map scripts (Browser/WorkAdventure) ⚠️ REQUIRED
-│   └── main.ts                # Your map scripts go here
-│
-│
-├── 📁 tilesets/               # Map tileset images (PNG)
-│
-├── 📄 *.tmj                   # Map files (office.tmj, conference.tmj, etc.)
-├── 📄 vite.config.ts          # Vite configuration
-└── 📄 package.json            # Dependencies and scripts
-```
+We recommend following this file structure:
 
-The **server** (Express app, controllers, HTML publishing pages, static assets) is provided by the npm package **`@workadventure/map-starter-kit-core`**. Updating this dependency gives you new publishing UI and server features without changing your maps or config.
-
-### Quick Reference
-
-- *`src/`*: **Map scripts** (MUST be here for compilation) ⚠️
+- *`public/`*: Static files like PDFs or audio files
+- *`src/`*: Script files or design source files
 - *`tilesets/`*: All PNG tilesets
-- *`app/`*: **Server entry point** – loads the core package; do not add server logic here
 
 > [!TIP]
 > - If you want to use more than one map file, just add the new map file in the root folder (we recommend creating a copy of *office.tmj* and editing it to avoid any mistakes).
 > - We recommend using **512x512** images for the map thumbnails.
-> - If you are going to create custom websites to embed in the map, please reference the HTML files in the `input` option in *buildmap.vite.config.js*.
-
-### 📁 Server entry point (`app/`)
-
-The `app/` directory contains only the **entry point** that loads the server from **`@workadventure/map-starter-kit-core`**.
-
-- *`app.ts`*: Imports and re-exports the Express app from the core package (for Vite’s server plugin).
-
-The actual server (Express, routes, HTML pages, upload, map storage) lives in the dependency. To get updates to the publishing UI and server behaviour, run `npm update @workadventure/map-starter-kit-core`.
-
-> [!IMPORTANT]
-> Do **not** add server logic or new controllers in `app/`. The server is fully provided by the core package.
-
-### 📁 Map Scripts Development (`src/`) ⚠️
-
-The `src/` directory is where you **MUST** place **all map-related scripts** that will be executed in the browser. See [src/README.md](./src/README.md) for detailed documentation and examples.
-
-- *`main.ts`*: Main map script (referenced in `.tmj` files)
-
-> [!IMPORTANT]
-> **All map scripts MUST be placed in the `src/` directory** to be properly compiled and bundled by Vite. Scripts in this directory are:
-> - Automatically transformed from TypeScript to JavaScript
-> - Bundled with their npm dependencies (like `@workadventure/scripting-api-extra`)
-> - Served with the correct MIME types
-> - Referenced in your `.tmj` map files using paths like `src/main.ts`
-
-> [!WARNING]
-> Do not place map scripts outside the `src/` directory. They will not be compiled correctly and will cause errors in the browser.
+> - If you are going to create custom websites to embed in the map, please reference the HTML files in the `input` option in *vite.config.js*.
 
 ## 📜 Requirements
 
 - Node.js version >= 18
 
+## Installation and testing
+
 ## 🛠️ Installation and Testing
 
-### Prerequisites
-
-- **Node.js** version >= 18 ([Download Node.js](https://nodejs.org/en/))
-- **npm** (comes with Node.js)
-
-### 📦 Installation
-
-1. Clone or download this repository
-2. Navigate to the project root directory
-3. Install dependencies:
+With npm installed (which comes with [Node.js](https://nodejs.org/en/)), run the following command in the root directory of the project:
 
 ```bash
 npm install
 ```
 
-This will install all required dependencies, including Vite, TypeScript, WorkAdventure packages, and **`@workadventure/map-starter-kit-core`** (server and publishing UI).
-
-### 🚀 Development
-
-#### Start Development Server
-
-Start the Vite development server with hot module replacement:
+Then, you can test your map by running:
 
 ```bash
 npm run dev
 ```
 
-This will:
-- Start the Vite dev server (usually on `http://localhost:5173`)
-- Enable hot module replacement for instant updates
-- Automatically transform TypeScript files in `src/`
-- Serve your maps and assets
-
-> [!TIP]
-> The development server will automatically open your browser. If not, navigate to the URL shown in the terminal.
-
-#### Test Production Build
-
-To test how your map will behave in production:
+You can also test the optimized map as it will be in production by running:
 
 ```bash
-# Build the optimized production version for your map
-npm run buildmap
-
+npm run build
+npm run prod
 ```
 
-This will:
-- Compile TypeScript to JavaScript
-- Optimize and bundle all assets
-- Create a production-ready `dist/` folder
-- Start a preview server to test the optimized build
-
-### 📤 Upload Your Map
-
-#### Upload to WA Map Storage
-
-To upload your map to the WorkAdventure Map Storage:
+You can manually [upload your map to the WA Map Storage]([WA Map Storage](https://github.com/workadventure/upload-maps)) by running:
 
 ```bash
 npm run upload
 ```
 
-This command will:
-1. Build your map (`npm run buildmap`)
-2. Upload it to the configured WA Map Storage
+The three important variables that control the upload feature are:
 
-> [!IMPORTANT]
-> Before uploading, you need to configure your upload settings. The upload feature requires three environment variables:
+1. `MAP_STORAGE_URL` *(local: created in .env by the upload command / CI: to be added as a Github secret optionally)*
+2. `MAP_STORAGE_API_KEY` *(local: created in .env.secret by the upload command / CI: to be added as a Github secret)*
+3. `UPLOAD_DIRECTORY` *(local: created in .env by the upload command / CI: to be added as a Github secret optionally)*
 
-1. **`MAP_STORAGE_URL`** - Your WorkAdventure Map Storage URL
-   - *Local development*: Created in `.env` by the upload command
-   - *CI/CD*: Add as a GitHub secret (optional)
-
-2. **`MAP_STORAGE_API_KEY`** - Your API key for authentication
-   - *Local development*: Created in `.env.secret` by the upload command
-   - *CI/CD*: Add as a GitHub secret (required)
-
-3. **`UPLOAD_DIRECTORY`** - Directory path on the storage server
-   - *Local development*: Created in `.env` by the upload command
-   - *CI/CD*: Add as a GitHub secret (optional)
-
-#### Configure Upload Settings
-
-You can configure these settings through the web interface:
-1. Start the development server (`npm run dev`)
-2. Navigate to the upload configuration page
-3. Fill in your Map Storage credentials
-4. Save and upload your map
-
-For more details, read [the WorkAdventure upload documentation](https://docs.workadventu.re/map-building/tiled-editor/publish/wa-hosted).
-
-### 📋 Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite development server with hot reload |
-| `npm run buildmap` | Build only the map files (without frontend) |
-| `npm run upload` | Build and upload map to WA Map Storage |
-| `npm run upload-only` | Upload map without rebuilding (requires existing build) |
+Read [the documentation](https://docs.workadventu.re/map-building/tiled-editor/publish/wa-hosted) to learn more about the upload feature.
 
 ## 📜 Licenses
 
